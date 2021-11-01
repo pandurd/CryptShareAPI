@@ -50,7 +50,7 @@ namespace GroceryStoreAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors();
+            app.UseCors("CryptPolicy");
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GroceryStoreAPI v1"));
             //app.UseHttpsRedirection();
