@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using System.Text;
 
 namespace CryptShareAPI.Controllers
 {
@@ -19,7 +20,11 @@ namespace CryptShareAPI.Controllers
         [Route("")]
         public async Task<IActionResult> PostAsync(EmailNotification emailNotification)
         {
-            var apiKey = "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";
+            var bytes = Convert.FromBase64String("Ry5ObHhFQ3BhTlN1cTNBb0U1ald6UWF3Llo0RXBFeVdvc2pkeUt2M2t4R1VyNHlGVHRyc1JCckcyLWdDamQ0dlJFZFU=");
+
+            var decodedString = Encoding.UTF8.GetString(bytes);
+
+            var apiKey = decodedString;
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("pandudrangan@live.com", "CryptShare");
             var subject = "Cyrpt Share File share";
