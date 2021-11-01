@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "cryptshareaks-bee8"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "cryptshareaks-bee8"
+  template:
+    metadata:
+      labels:
+        app: "cryptshareaks-bee8"
+    spec:
+      containers:
+        - name: "cryptshareaks-bee8"
+          image: "crytpfilesharerepo.azurecr.io/cryptshareaks"
+          ports:
+          - containerPort: 80
