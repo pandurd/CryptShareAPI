@@ -59,6 +59,23 @@ namespace CryptShareAPI.Controllers
             return Ok(createdEntity);
         }
 
+
+        [HttpPost]
+        [Route("share")]
+        public async Task<IActionResult> PostAsync([FromBody] SharedFileEntity entity, string FileName)
+        {
+            entity.PartitionKey = entity.SharedEmail;
+            entity.RowKey = Guid.NewGuid().ToString();
+
+            var createdEntity = await _storageService.InsertOrMergeSharedFileAsync(entity);
+            var subject = "Cyrpt Share File share";
+            var content = $"File {FileName} has been shared on the site, Please visit site";
+ 
+            CryptShareAPI.Services.EmailService.SendEmail(entity.SharedEmail, subject, content);
+
+            return Ok(createdEntity);
+        }
+
         [HttpPut]
         public async Task<IActionResult> PutAsync([FromBody] FileEntity entity)
         {
@@ -66,6 +83,22 @@ namespace CryptShareAPI.Controllers
             entity.RowKey = entity.FileGuid.ToString();
 
             await _storageService.InsertOrMergeAsync(entity);
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Route("OTP")]
+        public async Task<IActionResult> PutOTPAsync([FromBody] SharedFileEntity entity)
+        {
+            var random = new Random();
+            var otp = random.Next(1000, 9999);
+            entity.OTP = otp;
+
+            var subject = "OTP for file";
+            var content = $"OTP for opening file {otp} ";
+            CryptShareAPI.Services.EmailService.SendEmail(entity.SharedEmail, subject, content);
+
+            await _storageService.InsertOrMergeSharedFileAsync(entity);
             return NoContent();
         }
 

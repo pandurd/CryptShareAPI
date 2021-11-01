@@ -22,11 +22,14 @@ namespace CryptShareAPI.Controllers
     public class BlobsController : ControllerBase
     {
         private readonly BlobServiceClient _client;
+        private readonly ITableStorageService _storageService;
         private readonly string _password = "password";
         private readonly string containerName = "files";
-        public BlobsController(BlobServiceClient client)
+
+        public BlobsController(BlobServiceClient client, ITableStorageService storageService)
         {
             _client = client;
+            _storageService = storageService;
         }
 
         [HttpGet]
@@ -73,7 +76,7 @@ namespace CryptShareAPI.Controllers
         }
 
         [HttpGet("{name}")]
-        public async Task<FileResult> GetAsync(string name)
+        public async Task<FileResult> GetAsync(string name, string otp)
         {
             BlobContainerClient container = _client.GetBlobContainerClient(containerName);
             BlobClient blob = container.GetBlobClient(name);
@@ -91,6 +94,38 @@ namespace CryptShareAPI.Controllers
 
             var stream = EncryptionService.Decrypt(downloadInfo.Value.Content, _password);
             return File(stream, downloadInfo.Value.ContentType, name);
+        }
+
+        [HttpGet("/guid/{FileGuid}/{otp}")]
+        public async Task<IActionResult> GetAsync(Guid FileGuid, long otp, string email)
+        {
+            var entity = await _storageService.RetrieveAsyncByFile(FileGuid, email);
+
+            //owner
+            if (entity != null)
+            {
+                BlobContainerClient container = _client.GetBlobContainerClient(containerName);
+                BlobClient blob = container.GetBlobClient(entity.FileName);
+                Response<BlobDownloadInfo> downloadInfo = await blob.DownloadAsync();
+
+                var stream = EncryptionService.Decrypt(downloadInfo.Value.Content, _password);
+                return File(stream, downloadInfo.Value.ContentType, entity.FileName);
+            }
+            else
+            {
+                //shared with user
+                var sharedEntity = await _storageService.RetrieveSharedAsyncByFile(FileGuid, email);
+
+                if(sharedEntity.OTP != otp)
+                     return BadRequest();
+
+                BlobContainerClient container = _client.GetBlobContainerClient(containerName);
+                BlobClient blob = container.GetBlobClient(entity.FileName);
+                Response<BlobDownloadInfo> downloadInfo = await blob.DownloadAsync();
+
+                var stream = EncryptionService.Decrypt(downloadInfo.Value.Content, _password);
+                return File(stream, downloadInfo.Value.ContentType, entity.FileName);
+            }            
         }
 
         [HttpPost]

@@ -8,5 +8,6 @@ namespace CryptShareAPI.Models
         public Guid Id { get; set; }
         public Guid FileGuid { get; set; }
         public string SharedEmail { get; set; }
+        public long OTP { get; set; }
     }
 }

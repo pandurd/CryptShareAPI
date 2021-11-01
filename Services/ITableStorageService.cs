@@ -11,6 +11,7 @@ namespace CryptShareAPI.Services
         Task<List<FileEntity>> RetrieveExpiredAsync();
         Task<List<SharedFileEntity>> RetrieveSharedAsyncByEmail(string email);
         Task<FileEntity> RetrieveAsyncByFile(Guid FileGuid, string email);
+        Task<SharedFileEntity> RetrieveSharedAsyncByFile(Guid guid, string email);
         Task<FileEntity> InsertOrMergeAsync(FileEntity entity);
         Task<SharedFileEntity> InsertOrMergeSharedFileAsync(SharedFileEntity entity);
         Task<FileEntity> DeleteAsync(FileEntity entity);

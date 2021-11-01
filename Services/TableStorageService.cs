@@ -90,6 +90,12 @@ namespace CryptShareAPI.Services
 			return await ExecuteTableOperation(retrieveOperation) as FileEntity;
 		}
 
+		public async Task<SharedFileEntity> RetrieveSharedAsyncByFile(Guid guid, string email)
+		{
+			var retrieveOperation = TableOperation.Retrieve<SharedFileEntity>(email, guid.ToString());
+			return await ExecuteTableOperation(retrieveOperation) as SharedFileEntity;
+		}
+
 		public async Task<FileEntity> InsertOrMergeAsync(FileEntity entity)
 		{
 			var insertOrMergeOperation = TableOperation.InsertOrMerge(entity);
